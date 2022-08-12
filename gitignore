@@ -1,0 +1,32 @@
+# Compiled source #
+###################
+*.dll
+*.exe
+
+# Python #
+###################
+*__pycache__/
+
+# Packages #
+############
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.iso
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+
+# Other files #
+######################
+*.lnk
+config.h
+.vscode
+Archive/
+Backup/

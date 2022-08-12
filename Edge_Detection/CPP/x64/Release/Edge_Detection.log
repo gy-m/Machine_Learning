@@ -1,0 +1,6 @@
+﻿  main.cpp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 81 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  Edge_Detection.vcxproj -> D:\Repositories\VisualStudioProjects\Remote\Machine_Learning\Edge_Detection\x64\Release\Edge_Detection.exe
