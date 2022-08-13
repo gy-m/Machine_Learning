@@ -15,11 +15,11 @@ using namespace std;
 
 void show_image(string image_name, Mat img)
 {
-	namedWindow("xxx", WINDOW_NORMAL);
-	resizeWindow("xxx", 800, 800);
-	imshow("xxx", img);
-	waitKey(0);
+	namedWindow(image_name, WINDOW_NORMAL);
+	resizeWindow(image_name, 800, 800);
+	imshow(image_name, img);
 }
+
 
 // Driver Code
 int main(int argc, char** argv)
@@ -34,24 +34,9 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	// Show our image inside a window (source image)
-	namedWindow("Original", WINDOW_NORMAL);
-	resizeWindow("Original", 800, 800);
-	imshow("Original", image_original);
-	waitKey(0);
-
 	// converte to a greyscale image
 	Mat image_grey_scale;
 	cvtColor(image_original, image_grey_scale, COLOR_BGR2GRAY);
-	// Show our image inside a window (greyscale image)
-	/*
-	namedWindow("Greyscale", WINDOW_NORMAL);
-	resizeWindow("Greyscale", 800, 800);
-	imshow("Greyscale", image_grey_scale);
-	waitKey(0);
-	*/
-
-	show_image("Greyscale", image_grey_scale);
 
 	// converte to a sobel image, meaning soble filter implemented (sobel image)
 	Mat sobelx;
@@ -63,12 +48,6 @@ int main(int argc, char** argv)
 	Mat image_sobel;
 	sobelx.convertTo(image_sobel, CV_8U, 255.0 / (maxVal - minVal), -minVal * 255.0 / (maxVal - minVal));
 
-	// Show our image inside a window (sobel image)
-	namedWindow("Sobel", WINDOW_NORMAL);
-	resizeWindow("Sobel", 800, 800);
-	imshow("Sobel", image_sobel);
-	waitKey(0);
-
 	// converte to a laplacian image, meaning Laplacian filter implemented (laplacian image)
 	Mat src, src_gray, dst;
 	Mat image_laplacian;
@@ -79,10 +58,11 @@ int main(int argc, char** argv)
 	Laplacian(image_grey_scale, dst, ddepth, kernel_size, scale, delta, BORDER_DEFAULT);
 	convertScaleAbs(dst, image_laplacian);
 
-	// Show our image inside a window (laplacian image)
-	namedWindow("Laplacian", WINDOW_NORMAL);
-	resizeWindow("Laplacian", 800, 800);
-	imshow("Laplacian", image_laplacian);
+	// Show our images
+	show_image("Original", image_original);
+	show_image("Greyscale", image_grey_scale);
+	show_image("Sobel", image_sobel);
+	show_image("Laplacian", image_laplacian);
 	waitKey(0);
 
 	return 0;
