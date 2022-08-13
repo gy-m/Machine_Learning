@@ -13,16 +13,13 @@ using namespace std;
 // Driver Code
 int main(int argc, char** argv)
 {
-	// Create a blank image of size
-	// (500 x 500) with white background
+	// Create an image of size
 	// (B, G, R) : (255, 255, 255)
 	Mat image = imread("image_original.jfif", IMREAD_COLOR);
 
-	// Check if the image is
-	// created successfully.
+	// Check if the image is created successfully.
 	if (!image.data) {
-		cout << "Could not open or"
-			<< " find the image" << std::endl;
+		cout << "Could not open or find the image" << std::endl;
 		return 0;
 	}
 
