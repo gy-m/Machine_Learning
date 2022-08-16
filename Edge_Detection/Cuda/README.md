@@ -1,8 +1,4 @@
-# Native C, CUDA, OpenCV implementations of the Sobel Filter 
-## Course project for "Programming Tools for Parallel and Distributed Systems"
-## University of Pisa
-## Department of Computer Science
-## Academic Year 2018-2019
+# Cuda implementations of the Sobel Filter 
 
 ### What is a Sobel Filter?
 
@@ -40,22 +36,10 @@ cd $HOME
 git clone https://github.com/DanyEle/Sobel_Filter.git
 ```
 
-## 3 - Run the native C version
-In order to run the native C version, make sure you have the gcc compiler installed. We will now proceed to compile the project files and perform one run with an input image. 
-```sh
-cd $HOME
-cd Sobel_Filter/Native_Sobel
-./compile.sh
-./Debug/Native_Sobel imgs_in/512x512.png
-```
-The 512x512.png image can be replaced by any other image (e.g.: 1024x512.png, 1024x1024.png, 2048x1024.png).
-The output lies in the Sobel_Filter/Native_Sobel/imgs_out/ folder. 
-If you would like to execute 10 runs of the native C Sobel Filter with a certain input image, then just run:
-```sh
-./run_experiments.sh <input_image>
-```
+## 3 - Run the Python version
+TBD
 
-## 4 - Run the OpenCV Version
+## 4 - Run the CPP with OpenCV Version
 In order to run the OpenCV version, make sure you have the g++ compiler and OpenCV installed. 
 To quickly install OpenCV in Linux:
 ```sh
@@ -91,27 +75,3 @@ If you would like to execute 10 runs of the CUDA Sobel Filter with a certain inp
 ```sh
 ./run_experiments.sh <input_image>
 ```
-
-## 6 - CUDA with multiple pixels per thread
-
-In order to run the CUDA version using multiple pixels per thread, just follow the instructions
-for the plain CUDA version and run the following commands:
-
-```sh
-cd $HOME
-cd Sobel_Filter/CUDA_Sobel_Block
-./compile.sh
-./Debug/CUDA_Sobel imgs_in/512x512.png 2
-```
-The output lies in the Sobel_Filter/CUDA_Sobel/imgs_out/ folder. 
-If you would like to execute 10 runs of the CUDA Sobel Filter with a certain input image
-and a certain amount of pixels per thread, then just run:
-```sh
-./run_experiments.sh <input_image> <amount_of_pixels>
-```
- 
-
-
-
-
-
