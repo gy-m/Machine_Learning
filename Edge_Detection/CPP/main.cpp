@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 {
 	// Create an image of size
 	// (B, G, R) : (255, 255, 255)
-	Mat image_original = imread("image_original.jfif", IMREAD_COLOR);
+	Mat image_original = imread("image_original.jpg", IMREAD_COLOR);
 
 	// Check if the image is created successfully.
 	if (!image_original.data) {
