@@ -40,15 +40,8 @@ int main ( int argc, char** argv )
 {
 		//all the time_val declarations are put at the beginning of the file for better code readability
 		struct timeval comp_start_rgb_to_gray, comp_end_rgb_to_gray;
-		struct timeval comp_start_alloc_h_vec, comp_end_alloc_h_vec;
-		struct timeval start_h_vec_alloc, end_h_vec_alloc;
 		struct timeval comp_start_horiz_grad, comp_end_horiz_grad;
-		struct timeval start_h_vec_copy, end_h_vec_copy;
-		struct timeval start_h_vec_free, end_h_vec_free;
-		struct timeval comp_start_alloc_v_grad, comp_end_alloc_v_grad;
-		struct timeval start_v_vec_alloc, end_v_vec_alloc;
 		struct timeval comp_start_vert_grad, comp_end_vert_grad;
-		struct timeval start_v_vec_copy, end_v_vec_copy;
 		struct timeval start_countour_alloc, end_countour_alloc;
 		struct timeval start_countour_copy, end_countour_copy;
 		struct timeval start_free_countour, end_free_countour;
@@ -147,105 +140,79 @@ int main ( int argc, char** argv )
 		cudaFree (dev_b_vec);
 
 		//###################### 3. Step - Compute vertical and horizontal gradient ##########
+ 
+		//######### Compute the HORIZONTAL GRADIENT #########
 
-		//###Compute the HORIZONTAL GRADIENT#####
-
-		get_time(comp_start_alloc_h_vec);
-   	    //host horizontal kernel
+   	//host horizontal kernel
 		int sobel_h[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
 		int * dev_sobel_h;
-   	    byte * dev_sobel_h_res;
-		get_time(comp_end_alloc_h_vec);
-
-		get_time(start_h_vec_alloc);
+   	byte * dev_sobel_h_res;
 
 		//allocate memory for device horizontal kernel
 		HANDLE_ERROR ( cudaMalloc((void **)&dev_sobel_h , SOBEL_OP_SIZE*sizeof(int)));
-
 		//copy the content of the host horizontal kernel to the device horizontal kernel
-	    HANDLE_ERROR (cudaMemcpy (dev_sobel_h , sobel_h , SOBEL_OP_SIZE*sizeof(int) , cudaMemcpyHostToDevice));
-
-	    //allocate memory for the resulting horizontal gradient on the device
+	  HANDLE_ERROR (cudaMemcpy (dev_sobel_h , sobel_h , SOBEL_OP_SIZE*sizeof(int) , cudaMemcpyHostToDevice));
+	  //allocate memory for the resulting horizontal gradient on the device
 		HANDLE_ERROR ( cudaMalloc((void **)&dev_sobel_h_res , gray_size*sizeof(byte)));
 
-		get_time(end_h_vec_alloc);
 
+	  // starting time (cuda) - horizontal calculation
 		get_time(comp_start_horiz_grad);
-		//perform horizontal gradient calculation for every pixel
-		it_conv <<< width, height>>> (dev_gray_image, gray_size, width, dev_sobel_h, dev_sobel_h_res);
-	    cudaDeviceSynchronize();
 
-		//fixed segmentation fault when processing large images by using a malloc
-		byte* sobel_h_res = (byte*) malloc(gray_size * sizeof(byte));
+			//perform horizontal gradient calculation for every pixel
+			it_conv <<< width, height>>> (dev_gray_image, gray_size, width, dev_sobel_h, dev_sobel_h_res);
+	  	cudaDeviceSynchronize();
+			//fixed segmentation fault when processing large images by using a malloc
+			byte* sobel_h_res = (byte*) malloc(gray_size * sizeof(byte));
+		
+		// ending time (cuda) - horizontal calculation
 		get_time(comp_end_horiz_grad);
+
 		//copy the resulting horizontal array from device to host
+	  HANDLE_ERROR (cudaMemcpy(sobel_h_res , dev_sobel_h_res , gray_size*sizeof(byte) , cudaMemcpyDeviceToHost));
 
-		get_time(start_h_vec_copy);
-	    HANDLE_ERROR (cudaMemcpy(sobel_h_res , dev_sobel_h_res , gray_size*sizeof(byte) , cudaMemcpyDeviceToHost));
-	    get_time(end_h_vec_copy);
+	  //free-up the memory for the vectors allocated
+	  cudaFree(dev_sobel_h);
 
 
-		get_time(start_h_vec_free);
-	    //free-up the memory for the vectors allocated
-	    cudaFree(dev_sobel_h);
-	    get_time(end_h_vec_free);
+		//######### Compute the VERTICAL GRADIENT #########
 
-	    //output the horizontal gradient to a file if INTERMEDIATE_OUTPUT == true
-	    output_gradient(INTERMEDIATE_OUTPUT, sobel_h_res, gray_size, str_width, str_height, STRING_BUFFER_SIZE, "imgs_out/sobel_horiz_grad.png");
-
-		get_time(comp_start_alloc_v_grad);
-		//####Compute the VERTICAL GRADIENT#####
-	    int sobel_v[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+	  int sobel_v[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
 		int * dev_sobel_v;
 		byte * dev_sobel_v_res;
-		get_time(comp_end_alloc_v_grad);
 
-		get_time(start_v_vec_alloc);
 
 		//allocate memory for device vertical kernel
 		HANDLE_ERROR (cudaMalloc((void **)&dev_sobel_v , SOBEL_OP_SIZE*sizeof(int)));
-
 		//copy the content of the host vertical kernel to the device vertical kernel
 		HANDLE_ERROR (cudaMemcpy (dev_sobel_v , sobel_v , SOBEL_OP_SIZE*sizeof(int) , cudaMemcpyHostToDevice));
-
 		//allocate memory for the resulting vertical gradient on the device
 		HANDLE_ERROR (cudaMalloc((void **)&dev_sobel_v_res , gray_size*sizeof(byte)));
 
-		get_time(end_v_vec_alloc);
-
+	  // starting time (cuda) - vertical calculation
 		get_time(comp_start_vert_grad);
 
-		//perform vertical gradient calculation for every pixel
-		it_conv <<<width, height>>> (dev_gray_image, gray_size, width, dev_sobel_v, dev_sobel_v_res);
+			//perform vertical gradient calculation for every pixel
+			it_conv <<<width, height>>> (dev_gray_image, gray_size, width, dev_sobel_v, dev_sobel_v_res);
 	    cudaDeviceSynchronize();
+			//copy the resulting vertical array from device back to host
+			//fixed segmentation fault issue with big images
+			byte* sobel_v_res = (byte*) malloc(gray_size * sizeof(byte));
 
-		//copy the resulting vertical array from device back to host
-		//fixed segmentation fault issue with big images
-		byte* sobel_v_res = (byte*) malloc(gray_size * sizeof(byte));
-
+	  // ending time (cuda) - vertical calculation
 		get_time(comp_end_vert_grad);
 
 
-		get_time(start_v_vec_copy);
 		HANDLE_ERROR (cudaMemcpy(sobel_v_res , dev_sobel_v_res , gray_size*sizeof(byte) , cudaMemcpyDeviceToHost));
-		get_time(end_v_vec_copy);
 
 		//free-up the memory for the vectors allocated
-		struct timeval start_v_vec_free, end_v_vec_free;
-		get_time(start_v_vec_free);
 		cudaFree(dev_sobel_v);
-		get_time(end_v_vec_free);
 
-		struct timeval comp_start_countour_alloc, comp_end_countour_alloc;
-		get_time(comp_start_countour_alloc);
-
-	    output_gradient(INTERMEDIATE_OUTPUT, sobel_v_res, gray_size, str_width, str_height, STRING_BUFFER_SIZE, "imgs_out/sobel_vert_grad.png");
 
 		//#############4. Step - Compute the countour by putting together the vertical and horizontal gradients####
 		//allocate device memory for the final vector containing the countour
 
 		byte * dev_countour_img;
-		get_time(comp_end_countour_alloc);
 
 
 		get_time(start_countour_alloc);
@@ -284,14 +251,6 @@ int main ( int argc, char** argv )
 		//#############5. Step - Display the elapsed time in the different parts of the code
 
 		//##GPU memory movements (cudaMalloc, cudaMemCpy, cudaFree) ##
-		//horizontal vector operations
-		double time_alloc_h_vec = compute_elapsed_time(start_h_vec_alloc, end_h_vec_alloc);
-		double time_copy_h_vec = compute_elapsed_time(start_h_vec_copy, end_h_vec_copy);
-		double time_free_h_vec = compute_elapsed_time(start_h_vec_free, end_h_vec_free);
-		//vertical vector operations
-		double time_alloc_v_vec = compute_elapsed_time(start_v_vec_alloc, end_v_vec_alloc);
-		double time_copy_v_vec = compute_elapsed_time(start_v_vec_copy, end_v_vec_copy);
-		double time_free_v_vec = compute_elapsed_time(start_v_vec_free, end_v_vec_free);
 		//countour image operations
 		double time_alloc_countour = compute_elapsed_time(start_countour_alloc, end_countour_alloc);
 		double time_copy_countour = compute_elapsed_time(start_countour_copy, end_countour_copy);
@@ -299,11 +258,8 @@ int main ( int argc, char** argv )
 
 		//##Actual GPU computation##
 		double comp_time_rgb_to_gray = compute_elapsed_time(comp_start_rgb_to_gray, comp_end_rgb_to_gray);
-		double comp_time_h_alloc = compute_elapsed_time(comp_start_alloc_h_vec, comp_end_alloc_h_vec);
 		double comp_time_h_grad = compute_elapsed_time(comp_start_horiz_grad, comp_end_horiz_grad);
-		double comp_time_v_alloc = compute_elapsed_time(comp_start_alloc_v_grad, comp_end_alloc_v_grad);
 		double comp_time_v_grad = compute_elapsed_time(comp_start_vert_grad, comp_end_vert_grad);
-		double comp_time_count_alloc = compute_elapsed_time(comp_start_countour_alloc, comp_end_countour_alloc);
 		double comp_time_count_merge = compute_elapsed_time(comp_start_countour_merge, comp_end_countour_merge);
 
 
