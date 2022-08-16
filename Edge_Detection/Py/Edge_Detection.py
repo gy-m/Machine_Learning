@@ -40,7 +40,7 @@ if __name__ == '__main__':
     print("Starting Time of the program: " + time.ctime().format())
 
     # Read image from your local file system
-    image_original = mpimg.imread('image_original.jfif')
+    image_original = mpimg.imread('image_original.jpg')
     imgs.append(image_original)
 
     # Convert color image to grayscale
