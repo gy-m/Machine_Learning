@@ -40,9 +40,6 @@ int main ( int argc, char** argv )
 {
 		//all the time_val declarations are put at the beginning of the file for better code readability
 		struct timeval comp_start_rgb_to_gray, comp_end_rgb_to_gray;
-		struct timeval start_gray_vec_copy, end_gray_vec_copy;
-		struct timeval comp_start_str_alloc, comp_end_str_alloc;
-		struct timeval start_free_rgb, end_free_rgb;
 		struct timeval comp_start_alloc_h_vec, comp_end_alloc_h_vec;
 		struct timeval start_h_vec_alloc, end_h_vec_alloc;
 		struct timeval comp_start_horiz_grad, comp_end_horiz_grad;
@@ -63,14 +60,14 @@ int main ( int argc, char** argv )
 
 		//########### 1. STEP - LOAD THE IMAGE, ITS HEIGHT, WIDTH AND CONVERT IT TO RGB FORMAT #########
 
-		//########### Loading ###########
+		//########### Loading Image ######################
 
 		//Specify the input image. Formats supported: png, jpg, GIF.
 		const char * file_output_rgb = "imgs_out/image.rgb";
 		const char *png_strings[4] = {"convert ", argv[1], " ", file_output_rgb};
 		const char * str_PNG_to_RGB = array_strings_to_string(png_strings, 4, STRING_BUFFER_SIZE);
 
-		//########### Convertion (to RGB) ###########
+		//########### Convertion Image (to RGB) ###########
 
 		//execute the conversion from PNG to RGB, as that format is required by the program
 		int status_conversion = system(str_PNG_to_RGB);
@@ -100,68 +97,56 @@ int main ( int argc, char** argv )
 		//######################## 2. step - convert RGB image to gray-scale ########################
 
 
-	    int gray_size = rgb_size / 3;
-	    byte * r_vector, * g_vector, * b_vector;
+	  int gray_size = rgb_size / 3;
+	  byte * r_vector, * g_vector, * b_vector;
 
-	    //now take the RGB image vector and create three separate arrays for the R,G,B dimensions
-	    get_dimension_from_RGB_vec(0, rgb_image,  &r_vector, gray_size);
-	    get_dimension_from_RGB_vec(1, rgb_image,  &g_vector, gray_size);
+	  //now take the RGB image vector and create three separate arrays for the R,G,B dimensions
+	  get_dimension_from_RGB_vec(0, rgb_image,  &r_vector, gray_size);
+	  get_dimension_from_RGB_vec(1, rgb_image,  &g_vector, gray_size);
 	    get_dimension_from_RGB_vec(2, rgb_image,  &b_vector, gray_size);
 
-	    //allocate memory on the device for the r,g,b vectors
-	    byte * dev_r_vec, * dev_g_vec, * dev_b_vec;
-	    byte * dev_gray_image;
+    //allocate memory on the device for the r,g,b vectors
+    byte * dev_r_vec, * dev_g_vec, * dev_b_vec;
+    byte * dev_gray_image;
 
 
-	    // memory allocation for cuda conversion computation
-	    HANDLE_ERROR ( cudaMalloc((void **)&dev_r_vec, gray_size*sizeof(byte)));
-	    HANDLE_ERROR ( cudaMalloc((void **)&dev_g_vec, gray_size*sizeof(byte)));
-	    HANDLE_ERROR ( cudaMalloc((void **)&dev_b_vec, gray_size*sizeof(byte)));
-	    //copy the content of the r,g,b vectors from the host to the device
-	    HANDLE_ERROR (cudaMemcpy (dev_r_vec , r_vector , gray_size*sizeof(byte), cudaMemcpyHostToDevice));
-	    HANDLE_ERROR (cudaMemcpy (dev_g_vec , g_vector , gray_size*sizeof(byte), cudaMemcpyHostToDevice));
-	    HANDLE_ERROR (cudaMemcpy (dev_b_vec , b_vector, gray_size*sizeof(byte), cudaMemcpyHostToDevice));
-	    //allocate memory on the device for the output gray image
-	    HANDLE_ERROR ( cudaMalloc((void **)&dev_gray_image, gray_size*sizeof(byte)));
+    // memory allocation for cuda conversion computation
+    HANDLE_ERROR ( cudaMalloc((void **)&dev_r_vec, gray_size*sizeof(byte)));
+    HANDLE_ERROR ( cudaMalloc((void **)&dev_g_vec, gray_size*sizeof(byte)));
+    HANDLE_ERROR ( cudaMalloc((void **)&dev_b_vec, gray_size*sizeof(byte)));
+    //copy the content of the r,g,b vectors from the host to the device (cuda)
+    HANDLE_ERROR (cudaMemcpy (dev_r_vec , r_vector , gray_size*sizeof(byte), cudaMemcpyHostToDevice));
+    HANDLE_ERROR (cudaMemcpy (dev_g_vec , g_vector , gray_size*sizeof(byte), cudaMemcpyHostToDevice));
+    HANDLE_ERROR (cudaMemcpy (dev_b_vec , b_vector, gray_size*sizeof(byte), cudaMemcpyHostToDevice));
+    //allocate memory on the device for the output gray image
+    HANDLE_ERROR ( cudaMalloc((void **)&dev_gray_image, gray_size*sizeof(byte)));
 
 	  // starting time (cuda) - RGB to Grayscale computation
 		get_time(comp_start_rgb_to_gray);
 
-	  //actually run the kernel to convert input RGB file to gray-scale
-	  rgb_img_to_gray <<< width, height>>> (dev_r_vec, dev_g_vec, dev_b_vec, dev_gray_image, gray_size) ;
-	  cudaDeviceSynchronize();
+	  	//actually run the kernel to convert input RGB file to gray-scale
+	  	rgb_img_to_gray <<< width, height>>> (dev_r_vec, dev_g_vec, dev_b_vec, dev_gray_image, gray_size) ;
+	  	cudaDeviceSynchronize();
 		
-		byte * gray_image = (byte *) malloc(gray_size * sizeof(byte));
+			byte * gray_image = (byte *) malloc(gray_size * sizeof(byte));
 
 	  // starting time (cuda) - RGB to Grayscale computation
 		get_time(comp_end_rgb_to_gray);
 
-		get_time(start_gray_vec_copy);
 	  //Now take the device gray vector and bring it back to the host
 	  HANDLE_ERROR (cudaMemcpy(gray_image , dev_gray_image , gray_size*sizeof(byte) , cudaMemcpyDeviceToHost));
-		get_time(end_gray_vec_copy);
 
-		get_time(comp_start_str_alloc);
 		char str_width[100];
 		sprintf(str_width, "%d", width);
 
 		char str_height[100];
 		sprintf(str_height, "%d", height);
 
-
-
-		get_time(comp_end_str_alloc);
-
-		//output the gray-scale image to a PNG file if INTERMEDIATE_OUTPUT == true
-		output_gray_scale_image(INTERMEDIATE_OUTPUT, gray_image, gray_size, str_width, str_height, STRING_BUFFER_SIZE, "imgs_out/img_gray.png");
-
-		get_time(start_free_rgb);
 	  cudaFree (dev_r_vec);
 	  cudaFree (dev_g_vec);
 		cudaFree (dev_b_vec);
-		get_time(end_free_rgb);
 
-		//######################3. Step - Compute vertical and horizontal gradient ##########
+		//###################### 3. Step - Compute vertical and horizontal gradient ##########
 
 		//###Compute the HORIZONTAL GRADIENT#####
 
@@ -299,7 +284,6 @@ int main ( int argc, char** argv )
 		//#############5. Step - Display the elapsed time in the different parts of the code
 
 		//##GPU memory movements (cudaMalloc, cudaMemCpy, cudaFree) ##
-		double time_copy_gray = compute_elapsed_time(start_gray_vec_copy, end_gray_vec_copy);
 		//horizontal vector operations
 		double time_alloc_h_vec = compute_elapsed_time(start_h_vec_alloc, end_h_vec_alloc);
 		double time_copy_h_vec = compute_elapsed_time(start_h_vec_copy, end_h_vec_copy);
@@ -315,7 +299,6 @@ int main ( int argc, char** argv )
 
 		//##Actual GPU computation##
 		double comp_time_rgb_to_gray = compute_elapsed_time(comp_start_rgb_to_gray, comp_end_rgb_to_gray);
-		double comp_time_str_alloc = compute_elapsed_time(comp_start_str_alloc, comp_end_str_alloc);
 		double comp_time_h_alloc = compute_elapsed_time(comp_start_alloc_h_vec, comp_end_alloc_h_vec);
 		double comp_time_h_grad = compute_elapsed_time(comp_start_horiz_grad, comp_end_horiz_grad);
 		double comp_time_v_alloc = compute_elapsed_time(comp_start_alloc_v_grad, comp_end_alloc_v_grad);
