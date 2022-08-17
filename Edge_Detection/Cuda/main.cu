@@ -102,7 +102,7 @@ int main ( int argc, char** argv )
 	// starting time (cuda) - RGB to Grayscale computation
 	get_time(comp_start_rgb_to_gray);
 
-	//actually run the kernel to convert input RGB file to gray-scale
+	//actually run the kernel to convert input RGB file to gray-scale (cuda)
 	rgb_img_to_gray <<< width, height>>> (dev_r_vec, dev_g_vec, dev_b_vec, dev_gray_image, gray_size) ;
 	cudaDeviceSynchronize();
 	byte * gray_image = (byte *) malloc(gray_size * sizeof(byte));
@@ -128,23 +128,22 @@ int main ( int argc, char** argv )
 
 	//######### Compute the HORIZONTAL GRADIENT #########
 
-	//host horizontal kernel
+	// host horizontal kernel
 	int sobel_h[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
 	int * dev_sobel_h;
 	byte * dev_sobel_h_res;
 
-	//allocate memory for device horizontal kernel
+	//allocate memory for device horizontal kernel (memory allocation to hold the parameters to be used by cuda)
 	HANDLE_ERROR ( cudaMalloc((void **)&dev_sobel_h , SOBEL_OP_SIZE*sizeof(int)));
-	//copy the content of the host horizontal kernel to the device horizontal kernel
+	//copy the content of the host horizontal kernel to the device horizontal kernel (memory coping to hold the parameters to be used by cuda)
 	HANDLE_ERROR (cudaMemcpy (dev_sobel_h , sobel_h , SOBEL_OP_SIZE*sizeof(int) , cudaMemcpyHostToDevice));
-	//allocate memory for the resulting horizontal gradient on the device
+	//allocate memory for the resulting horizontal gradient on the device (memory allocation to hold the result cuda calculated)
 	HANDLE_ERROR ( cudaMalloc((void **)&dev_sobel_h_res , gray_size*sizeof(byte)));
-
 
 	// starting time (cuda) - horizontal calculation
 	get_time(comp_start_horiz_grad);
 
-	//perform horizontal gradient calculation for every pixel
+	//perform horizontal gradient calculation for every pixel (by cuda)
 	it_conv <<< width, height>>> (dev_gray_image, gray_size, width, dev_sobel_h, dev_sobel_h_res);
 	cudaDeviceSynchronize();
 	//fixed segmentation fault when processing large images by using a malloc
@@ -166,28 +165,26 @@ int main ( int argc, char** argv )
 	int * dev_sobel_v;
 	byte * dev_sobel_v_res;
 
-
-	//allocate memory for device vertical kernel
+	//allocate memory for device vertical kernel (memory allocation to hold the parameters to be used by cuda)
 	HANDLE_ERROR (cudaMalloc((void **)&dev_sobel_v , SOBEL_OP_SIZE*sizeof(int)));
-	//copy the content of the host vertical kernel to the device vertical kernel
+	//copy the content of the host vertical kernel to the device vertical kernel (memory coping to hold the parameters to be used by cuda)
 	HANDLE_ERROR (cudaMemcpy (dev_sobel_v , sobel_v , SOBEL_OP_SIZE*sizeof(int) , cudaMemcpyHostToDevice));
-	//allocate memory for the resulting vertical gradient on the device
+	//allocate memory for the resulting vertical gradient on the device (memory allocation to hold the result cuda calculated)
 	HANDLE_ERROR (cudaMalloc((void **)&dev_sobel_v_res , gray_size*sizeof(byte)));
 
 	// starting time (cuda) - vertical calculation
 	get_time(comp_start_vert_grad);
 
-	//perform vertical gradient calculation for every pixel
+	//perform vertical gradient calculation for every pixel (by cuda)
 	it_conv <<<width, height>>> (dev_gray_image, gray_size, width, dev_sobel_v, dev_sobel_v_res);
 	cudaDeviceSynchronize();
-	//copy the resulting vertical array from device back to host
 	//fixed segmentation fault issue with big images
 	byte* sobel_v_res = (byte*) malloc(gray_size * sizeof(byte));
 
 	// ending time (cuda) - vertical calculation
 	get_time(comp_end_vert_grad);
 
-
+	//copy the resulting vertical array from device back to host
 	HANDLE_ERROR (cudaMemcpy(sobel_v_res , dev_sobel_v_res , gray_size*sizeof(byte) , cudaMemcpyDeviceToHost));
 
 	//free-up the memory for the vectors allocated
@@ -201,13 +198,20 @@ int main ( int argc, char** argv )
 	HANDLE_ERROR (cudaMalloc((void **)&dev_countour_img , gray_size*sizeof(byte)));
 
 	struct timeval comp_start_countour_merge, comp_end_countour_merge;
+
+	// start time (cuda) - vertical and horizontal merging calculation
 	get_time(comp_start_countour_merge);
+
+	// calculate (cuda)
 	contour <<< width, height>>> (dev_sobel_h_res, dev_sobel_v_res, gray_size, dev_countour_img);
 	cudaDeviceSynchronize();
 	//copy the resulting countour image from the device back to host
 	byte * countour_img = (byte *) malloc(gray_size * sizeof(byte));
+
+	// end time (cuda) - vertical and horizontal merging calculation
 	get_time(comp_end_countour_merge);
 
+	//copy the resulting (dev_countour_img?) from device back to host
 	HANDLE_ERROR (cudaMemcpy(countour_img, dev_countour_img, gray_size*sizeof(byte) , cudaMemcpyDeviceToHost));
 
 	// free-up all the memory from the allocated vectors
@@ -223,11 +227,15 @@ int main ( int argc, char** argv )
 
 	// ######## GPU memory movements (cudaMalloc, cudaMemCpy, cudaFree) ########
 
-	// Actual GPU computation
+	// Actual GPU computation (most of it)
 	double comp_time_rgb_to_gray = compute_elapsed_time(comp_start_rgb_to_gray, comp_end_rgb_to_gray);
 	double comp_time_h_grad = compute_elapsed_time(comp_start_horiz_grad, comp_end_horiz_grad);
 	double comp_time_v_grad = compute_elapsed_time(comp_start_vert_grad, comp_end_vert_grad);
 	double comp_time_count_merge = compute_elapsed_time(comp_start_countour_merge, comp_end_countour_merge);
+
+	// sum of the (most) computation times
+	double total_time_gpu_comp = comp_time_rgb_to_gray + comp_time_h_grad + comp_time_v_grad + comp_time_count_merge ;
+	printf("Time spent on GPU computation: [%f] ms\n", total_time_gpu_comp); //debug
 
 	// ######## deallocate the heap memory to avoid any memory leaks ########
 	free(gray_image);
