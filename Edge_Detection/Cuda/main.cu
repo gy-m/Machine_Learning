@@ -1,19 +1,4 @@
 #include <stdio.h>
-
-
-#include "functions.c"
-
-
-//false --> No vertical gradient and horizontal gradient are output
-//true --> Vertical gradient and horizontal gradient are output
-#define INTERMEDIATE_OUTPUT false
-#define SOBEL_OP_SIZE 9
-#define STRING_BUFFER_SIZE 1024
-
-#define HANDLE_ERROR( err ) ( HandleError( err, __FILE__, __LINE__ ) )
-#define get_time(time) (gettimeofday(&time, NULL))
-
-
 #include "string.h"
 #include "stdlib.h"
 #include "math.h"
@@ -21,8 +6,19 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/time.h>
+#include "functions.c"
 
+// ?
+#define SOBEL_OP_SIZE 9															//
+#define STRING_BUFFER_SIZE 1024
+#define get_time(time) (gettimeofday(&time, NULL))
+#define HANDLE_ERROR( err ) ( HandleError( err, __FILE__, __LINE__ ) )
+
+
+// Cuda functions
 #include "kernels.cu"
+
+
 
 
 static void HandleError( cudaError_t err, const char *file, int line )
@@ -42,14 +38,6 @@ int main ( int argc, char** argv )
 		struct timeval comp_start_rgb_to_gray, comp_end_rgb_to_gray;
 		struct timeval comp_start_horiz_grad, comp_end_horiz_grad;
 		struct timeval comp_start_vert_grad, comp_end_vert_grad;
-		struct timeval start_countour_alloc, end_countour_alloc;
-		struct timeval start_countour_copy, end_countour_copy;
-		struct timeval start_free_countour, end_free_countour;
-		struct timeval i_o_start_write_img, i_o_end_write_img;
-
-
-
-
 
 		//########### 1. STEP - LOAD THE IMAGE, ITS HEIGHT, WIDTH AND CONVERT IT TO RGB FORMAT #########
 
@@ -209,64 +197,42 @@ int main ( int argc, char** argv )
 		cudaFree(dev_sobel_v);
 
 
-		//#############4. Step - Compute the countour by putting together the vertical and horizontal gradients####
-		//allocate device memory for the final vector containing the countour
-
+		//############# 4. Step - Compute the countour by putting together the vertical and horizontal gradients #############
+		
+		//allocate device memory for the final vector containing the countour (?)
 		byte * dev_countour_img;
-
-
-		get_time(start_countour_alloc);
-		HANDLE_ERROR ( cudaMalloc((void **)&dev_countour_img , gray_size*sizeof(byte)));
-		get_time(end_countour_alloc);
+		HANDLE_ERROR (cudaMalloc((void **)&dev_countour_img , gray_size*sizeof(byte)));
 
 		struct timeval comp_start_countour_merge, comp_end_countour_merge;
-
 		get_time(comp_start_countour_merge);
-		contour <<< width, height>>> (dev_sobel_h_res, dev_sobel_v_res, gray_size, dev_countour_img);
-	    cudaDeviceSynchronize();
-
-		//copy the resulting countour image from the device back to host
-		byte * countour_img = (byte *) malloc(gray_size * sizeof(byte));
-
+			contour <<< width, height>>> (dev_sobel_h_res, dev_sobel_v_res, gray_size, dev_countour_img);
+	    	cudaDeviceSynchronize();
+			//copy the resulting countour image from the device back to host
+			byte * countour_img = (byte *) malloc(gray_size * sizeof(byte));
 		get_time(comp_end_countour_merge);
 
-		get_time(start_countour_copy);
 		HANDLE_ERROR (cudaMemcpy(countour_img, dev_countour_img, gray_size*sizeof(byte) , cudaMemcpyDeviceToHost));
-		get_time(end_countour_copy);
 
-		get_time(start_free_countour);
-		//free-up all the memory from the allocated vectors
+		// free-up all the memory from the allocated vectors
 	    cudaFree(dev_sobel_h_res);
 	    cudaFree(dev_sobel_v_res);
 	    cudaFree(dev_countour_img);
-	    get_time(end_free_countour);
 
-	    //######Display the resulting countour image
-
-		get_time(i_o_start_write_img);
+	    // Display the resulting countour image
 	    output_gradient(true, countour_img, gray_size, str_width, str_height, STRING_BUFFER_SIZE, "imgs_out/sobel_countour.png");
-		get_time(i_o_end_write_img);
 
 
-		//#############5. Step - Display the elapsed time in the different parts of the code
+		//############# 5. Step - Display the elapsed time in the different parts of the code ###################################
 
-		//##GPU memory movements (cudaMalloc, cudaMemCpy, cudaFree) ##
-		//countour image operations
-		double time_alloc_countour = compute_elapsed_time(start_countour_alloc, end_countour_alloc);
-		double time_copy_countour = compute_elapsed_time(start_countour_copy, end_countour_copy);
-		double time_free_countour = compute_elapsed_time(start_free_countour, end_free_countour);
+		// ######## GPU memory movements (cudaMalloc, cudaMemCpy, cudaFree) ########
 
-		//##Actual GPU computation##
+		// Actual GPU computation
 		double comp_time_rgb_to_gray = compute_elapsed_time(comp_start_rgb_to_gray, comp_end_rgb_to_gray);
 		double comp_time_h_grad = compute_elapsed_time(comp_start_horiz_grad, comp_end_horiz_grad);
 		double comp_time_v_grad = compute_elapsed_time(comp_start_vert_grad, comp_end_vert_grad);
 		double comp_time_count_merge = compute_elapsed_time(comp_start_countour_merge, comp_end_countour_merge);
 
-
-		//##Input/Output over the disk (image loading and final image writing)##
-		double i_o_time_write_img = compute_elapsed_time(i_o_start_write_img, i_o_end_write_img);
-
-		//let's deallocate the heap memory to avoid any memory leaks
+		// ######## deallocate the heap memory to avoid any memory leaks ########
 		free(gray_image);
 		free(sobel_h_res);
 		free(sobel_v_res);
