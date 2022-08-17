@@ -54,17 +54,19 @@ int main ( int argc, char** argv )
 		return -1;
 	}
 
+	//#### Getting Image Properties (width, height, rgb_size) ####
+
 	//get the height and width of the input image
 	int width = 0;
 	int height = 0;
-
 	get_image_size(argv[1], &width, &height);
 
 	//Three dimensions because the input image is in RGB format
 	int rgb_size = width * height * 3;
-
 	//Used as a buffer for all pixels of the image
 	byte * rgb_image;
+
+	//#### Creating the RGB format out of the original image ####
 
 	//Load up the input image in RGB format into one single flattened array (rgbImage)
 	read_file(file_output_rgb, &rgb_image, rgb_size);
@@ -76,7 +78,7 @@ int main ( int argc, char** argv )
 	int gray_size = rgb_size / 3;
 	byte * r_vector, * g_vector, * b_vector;
 
-	//now take the RGB image vector and create three separate arrays for the R,G,B dimensions
+	// take the RGB image vector and create three separate arrays for the R,G,B dimensions
 	get_dimension_from_RGB_vec(0, rgb_image,  &r_vector, gray_size);
 	get_dimension_from_RGB_vec(1, rgb_image,  &g_vector, gray_size);
 	get_dimension_from_RGB_vec(2, rgb_image,  &b_vector, gray_size);
@@ -86,15 +88,15 @@ int main ( int argc, char** argv )
 	byte * dev_gray_image;
 
 
-	// memory allocation for cuda conversion computation
+	// memory allocation for cuda conversion computation (memory allocation to hold the parameters to be used by cuda)
 	HANDLE_ERROR ( cudaMalloc((void **)&dev_r_vec, gray_size*sizeof(byte)));
 	HANDLE_ERROR ( cudaMalloc((void **)&dev_g_vec, gray_size*sizeof(byte)));
 	HANDLE_ERROR ( cudaMalloc((void **)&dev_b_vec, gray_size*sizeof(byte)));
-	//copy the content of the r,g,b vectors from the host to the device (cuda)
+	//copy the content of the r,g,b vectors from the host to the device (memory coping to hold the parameters to be used by cuda)
 	HANDLE_ERROR (cudaMemcpy (dev_r_vec , r_vector , gray_size*sizeof(byte), cudaMemcpyHostToDevice));
 	HANDLE_ERROR (cudaMemcpy (dev_g_vec , g_vector , gray_size*sizeof(byte), cudaMemcpyHostToDevice));
 	HANDLE_ERROR (cudaMemcpy (dev_b_vec , b_vector, gray_size*sizeof(byte), cudaMemcpyHostToDevice));
-	//allocate memory on the device for the output gray image
+	//allocate memory on the device for the output gray image (memory allocation to hold the result cuda calculated)
 	HANDLE_ERROR ( cudaMalloc((void **)&dev_gray_image, gray_size*sizeof(byte)));
 
 	// starting time (cuda) - RGB to Grayscale computation
@@ -103,21 +105,21 @@ int main ( int argc, char** argv )
 	//actually run the kernel to convert input RGB file to gray-scale
 	rgb_img_to_gray <<< width, height>>> (dev_r_vec, dev_g_vec, dev_b_vec, dev_gray_image, gray_size) ;
 	cudaDeviceSynchronize();
-
 	byte * gray_image = (byte *) malloc(gray_size * sizeof(byte));
 
 	// starting time (cuda) - RGB to Grayscale computation
 	get_time(comp_end_rgb_to_gray);
 
-	//Now take the device gray vector and bring it back to the host
+	// take the device gray vector and bring it back to the host (from cuda to the host)
 	HANDLE_ERROR (cudaMemcpy(gray_image , dev_gray_image , gray_size*sizeof(byte) , cudaMemcpyDeviceToHost));
 
+	// ?
 	char str_width[100];
 	sprintf(str_width, "%d", width);
-
 	char str_height[100];
 	sprintf(str_height, "%d", height);
 
+	// free mrmory allocated for cuda computations
 	cudaFree (dev_r_vec);
 	cudaFree (dev_g_vec);
 	cudaFree (dev_b_vec);
