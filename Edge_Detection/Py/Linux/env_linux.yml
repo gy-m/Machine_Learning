@@ -1,0 +1,52 @@
+name: Edge_Detection_Py
+channels:
+  - conda-forge
+dependencies:
+  - _openmp_mutex=4.5=2_gnu
+  - ca-certificates=2022.6.15=h4fd8a4c_0
+  - freetype=2.12.1=hbbbf32d_0
+  - jpeg=9e=h9cdd2b7_2
+  - lcms2=2.12=h012adcb_0
+  - ld_impl_linux-aarch64=2.36.1=h02ad14f_2
+  - lerc=3.0=h01db608_0
+  - libblas=3.9.0=16_linuxaarch64_openblas
+  - libcblas=3.9.0=16_linuxaarch64_openblas
+  - libdeflate=1.10=hf897c2e_0
+  - libffi=3.2.1=h4c5d2ac_1007
+  - libgcc-ng=12.1.0=h3242a24_16
+  - libgfortran-ng=12.1.0=he9431aa_16
+  - libgfortran5=12.1.0=h41d5c85_16
+  - libgomp=12.1.0=h3242a24_16
+  - liblapack=3.9.0=16_linuxaarch64_openblas
+  - libopenblas=0.3.21=pthreads_h6cb6f83_1
+  - libpng=1.6.37=hf9034f9_4
+  - libsqlite=3.39.2=hf9034f9_1
+  - libstdcxx-ng=12.1.0=hd01590b_16
+  - libtiff=4.3.0=h8ba47be_4
+  - libwebp-base=1.2.4=h4e544f5_0
+  - libzlib=1.2.12=h4e544f5_2
+  - ncurses=6.3=headf329_1
+  - olefile=0.46=pyh9f0ad1d_1
+  - openssl=1.1.1q=h4e544f5_0
+  - pip=21.3.1=pyhd8ed1ab_0
+  - python=3.6.9=h9d8adfe_0_cpython
+  - python_abi=3.6=2_cp36m
+  - readline=8.1.2=h38e3740_0
+  - setuptools=58.0.4=py36h704843e_2
+  - sqlite=3.39.2=h69ca7e5_1
+  - tk=8.6.12=hd8af866_0
+  - wheel=0.37.1=pyhd8ed1ab_0
+  - xz=5.2.6=h9cdd2b7_0
+  - zlib=1.2.12=h4e544f5_2
+  - zstd=1.5.2=hc1e27d5_4
+  - pip:
+    - cycler==0.11.0
+    - kiwisolver==1.3.1
+    - matplotlib==3.3.4
+    - numpy==1.19.5
+    - opencv-python==4.6.0.66
+    - pillow==8.4.0
+    - pyparsing==3.0.9
+    - python-dateutil==2.8.2
+    - six==1.16.0
+prefix: /home/gm/mambaforge/envs/Edge_Detection_Py
