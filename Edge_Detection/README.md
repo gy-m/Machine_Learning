@@ -74,7 +74,7 @@ C++ results:
 
 Cuda rsults:
 
-* Linux OS (Architecture: Quad-core ARM® A57 @ 1.43 GHz, using the [GPU](https://developer.nvidia.com/embedded/jetson-nano-2gb-developer-kit)) - **average of 240 miliseconds approximatly** for evry GPU iteration:
+* Linux OS (Architecture: Quad-core ARM® A57 @ 1.43 GHz, using the [GPU](https://developer.nvidia.com/embedded/jetson-nano-2gb-developer-kit)) - **Average of 240 miliseconds approximatly** for evry GPU iteration:
 
 <kbd> <p align="center">
   <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/blob/master/Edge_Detection/Cuda/Demonstrations/Demonstration.jpg?raw=true">
