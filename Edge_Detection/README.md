@@ -66,14 +66,19 @@ Python results:
 
 C++ results:
 
-* Windows OS (Architecture: I7, 64 bit):
+* Windows OS (Architecture: I7, 64 bit) - 1 second approximatly:
 
 <kbd> <p align="center">
   <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/blob/master/Edge_Detection/CPP/Windows/Demonstrations/Demonstration.jpg?raw=true">
 </p> </kbd>
 
-* Linux OS (Architecture: Quad-core ARM® A57 @ 1.43 GHz): Please refer to the "TODOs"
+Cuda rsults:
 
+* Linux OS (Architecture: Quad-core ARM® A57 @ 1.43 GHz, using the [GPU](https://developer.nvidia.com/embedded/jetson-nano-2gb-developer-kit)):
+
+<kbd> <p align="center">
+  <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/blob/master/Edge_Detection/Cuda/Demonstrations/Demonstration.jpg?raw=true">
+</p> </kbd>
 
 
 ## Notes
@@ -82,4 +87,6 @@ TBD
 
 ## Repository Status
 * Status - Beta
-* TODOs - Fix CPP/Linux project, and update "Installations" section of this file accordingly.
+* TODOs
+    * Calculate only the convolution time (instead strating and programming running time) for every implementation and compare it to GPU running time (Cuda implementation)
+    * Fix CPP/Linux project, and update "Installations" and "Demonstration" sections of this file accordingly.
