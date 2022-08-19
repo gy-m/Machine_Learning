@@ -50,18 +50,26 @@
 
 
 ## Demonstration
-* Python results:
-    * Windows OS (Architecture: I7, 64 bit):
+Python results:
+
+* Windows OS (Architecture: I7, 64 bit):
 
 <kbd> <p align="center">
   <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/blob/master/Edge_Detection/Py/Windows/Demonstrations/Demonstration.jpg?raw=true">
 </p> </kbd>
 
-    * Linux OS (Architecture: Quad-core ARM® A57 @ 1.43 GHz):
+* Linux OS (Architecture: Quad-core ARM® A57 @ 1.43 GHz):
 
 <kbd> <p align="center">
   <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/blob/master/Edge_Detection/Py/Linux/Demonstrations/Demonstration.jpg?raw=true">
 </p> </kbd>
+
+C++ results:
+
+* Windows OS (Architecture: I7, 64 bit):
+
+* Linux OS (Architecture: Quad-core ARM® A57 @ 1.43 GHz): Please refer to the "TODOs"
+
 
 
 ## Notes
