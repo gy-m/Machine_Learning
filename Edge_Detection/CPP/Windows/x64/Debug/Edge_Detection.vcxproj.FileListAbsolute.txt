@@ -1,2 +1,3 @@
 D:\Repositories\VisualStudioProjects\Remote\Machine_Learning\Edge_Detection\x64\Debug\Edge_Detection.exe
 D:\Repositories\PycharmProjects\Remote\Machine_Learning\Edge_Detection\CPP\x64\Debug\Edge_Detection.exe
+D:\Repositories\PycharmProjects\Remote\Machine_Learning\Edge_Detection\CPP\Windows\x64\Debug\Edge_Detection.exe
