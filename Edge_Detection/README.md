@@ -53,9 +53,9 @@
 * Python results:
     * Windows (I7, 64 bit):
 
-<kbd>
+<kbd> <p align="center">
   <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/blob/master/Edge_Detection/Py/Windows/Demonstrations/Demonstraion.jpg?raw=true">
-</kbd>
+</p> </kbd>
 
 
 ## Notes
