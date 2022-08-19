@@ -52,13 +52,13 @@
 ## Demonstration
 Python results:
 
-* Windows OS (Architecture: I7, 64 bit):
+* Windows OS (Architecture: I7, 64 bit) - 4 second approximatly:
 
 <kbd> <p align="center">
   <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/blob/master/Edge_Detection/Py/Windows/Demonstrations/Demonstration.jpg?raw=true">
 </p> </kbd>
 
-* Linux OS (Architecture: Quad-core ARM® A57 @ 1.43 GHz):
+* Linux OS (Architecture: Quad-core ARM® A57 @ 1.43 GHz) - **35 second approximatly**:
 
 <kbd> <p align="center">
   <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/blob/master/Edge_Detection/Py/Linux/Demonstrations/Demonstration.jpg?raw=true">
@@ -66,7 +66,7 @@ Python results:
 
 C++ results:
 
-* Windows OS (Architecture: I7, 64 bit) - 1 second approximatly:
+* Windows OS (Architecture: I7, 64 bit) - **1 second approximatly**:
 
 <kbd> <p align="center">
   <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/blob/master/Edge_Detection/CPP/Windows/Demonstrations/Demonstration.jpg?raw=true">
@@ -74,7 +74,7 @@ C++ results:
 
 Cuda rsults:
 
-* Linux OS (Architecture: Quad-core ARM® A57 @ 1.43 GHz, using the [GPU](https://developer.nvidia.com/embedded/jetson-nano-2gb-developer-kit)):
+* Linux OS (Architecture: Quad-core ARM® A57 @ 1.43 GHz, using the [GPU](https://developer.nvidia.com/embedded/jetson-nano-2gb-developer-kit)) - **average of 240 miliseconds approximatly** for evry GPU iteration:
 
 <kbd> <p align="center">
   <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/blob/master/Edge_Detection/Cuda/Demonstrations/Demonstration.jpg?raw=true">
