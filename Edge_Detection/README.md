@@ -54,7 +54,7 @@
     * Windows (I7, 64 bit):
 
 <kbd>
-  <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/Edge_Detection/raw/master/Documentations/Documentation.jpg">
+  <img style="display: block;margin-left: auto;margin-right: auto; width: 50%; height: 50%;" src="https://github.com/gy-m/Machine_Learning/blob/master/Edge_Detection/Py/Windows/Demonstrations/Demonstraion.jpg?raw=true">
 </kbd>
 
 
