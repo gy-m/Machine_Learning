@@ -16,7 +16,7 @@ Every project has it's own installations requirements for it's packages and libr
 
 ## Usage
 Setting up the enviroments (best practice):
-* Open Visual code
+* Open Visual code (Optional. Can be donw with most of the terminals)
 * In the terminal of VC activate conda using the shortcut in the start menu for powershell (For example: `"C:\Users\gymak\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Anaconda3 (64-bit)\Anaconda Powershell Prompt (miniconda3)"`)
 * Create your virtual env with python version specification and activate it (`conda create --name my_env python=2.7`)
 * Activate the virtual env (`conda activate my_env`)
@@ -27,7 +27,7 @@ Setting up the enviroments (best practice):
 None
 
 ## TODO
-* Fix git ignore - At the moment git ignore does not ignore and _pychashe (Image_Segmentation) .vscode folder or any other folder specified in the gitignore file
+* Fix git ignore - At the moment git ignore does not ignore pychashe (Image_Segmentation), .vscode folder or any other folder specified in the gitignore file
 
 ## Repository-status
 Status - In Progress
