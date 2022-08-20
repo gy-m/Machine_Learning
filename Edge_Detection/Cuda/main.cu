@@ -107,7 +107,7 @@ int main ( int argc, char** argv )
 	cudaDeviceSynchronize();
 	byte * gray_image = (byte *) malloc(gray_size * sizeof(byte));
 
-	// starting time (cuda) - RGB to Grayscale computation
+	// ending time (cuda) - RGB to Grayscale computation
 	get_time(comp_end_rgb_to_gray);
 
 	// take the device gray vector and bring it back to the host (from cuda to the host)
