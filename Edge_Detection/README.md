@@ -88,5 +88,6 @@ Cuda rsults:
 ## Repository Status
 * Status - Beta
 * TODOs:
-    * Calculate the convolution time instead of programming running time
-    * CPP/Linux project - Config OpenCV on the jetson nano and demonstrate the results (in addition to the CPP windows demonstrations), and update "Installations" and "Demonstration" sections of this file accordingly.
+    * CPP project - Adding time function for convolution calculation time evaluation
+    * Py project - Calculate the convolution time instead of programming running time
+    * CPP/Linux project - Configure OpenCV on the jetson nano and demonstrate the results (in addition to the CPP windows demonstrations), and update "Installations" and "Demonstration" sections of this file accordingly.
